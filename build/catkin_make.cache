@@ -1,0 +1,2 @@
+.
+-DCATKIN_DEVEL_PREFIX=/home/unamspace/catkin_nvo/devel -DCMAKE_INSTALL_PREFIX=/home/unamspace/catkin_nvo/install -G Unix Makefiles
