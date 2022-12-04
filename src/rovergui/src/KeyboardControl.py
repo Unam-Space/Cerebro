@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-import Component
+import Panel_components
 
-class Key():
-    def Action(event):
+class Actions:
+
+    def __init__ (self,windowm):
+        self.window = windowm
+
+    def KeyboardControl(self, event): 
         key = event.keysym
         if(key == "W" or key == "w" or key == "Up"):
-            print("W")
+            Panel_components.Char(self.window, 1350, 700, "W")
         elif(key == "A" or key == "a" or key == "Left"):
-            print("A")
+            Panel_components.Char(self.window, 1350, 700, "A")
         elif(key == "S" or key == "s" or key == "Right"):
-            print("S")
+            Panel_components.Char(self.window, 1350, 700, "S")
         elif(key == "D" or key == "d" or key == "Down"): 
-            print("D")
-    
+            Panel_components.Char(self.window, 1350, 700, "D")

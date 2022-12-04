@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 from std_msgs.msg import String
 import rospy
-import Component
 
-class Simple():
+class ROS_node:
     def talker(): #Sends a message to the roscore
         pub = rospy.Publisher('chatter', String, queue_size = 10)
         rospy.init_node('talker', anonymous = True)
@@ -25,7 +24,7 @@ class Simple():
         
     def listener(): #This node 'listens' to roscore nodes
         rospy.init_node('listener', anonymous = True)
-        rospy.Subscriber("chatter", String, Simple.callback)
+        rospy.Subscriber("chatter", String, ROS_node.callback)
         print("I'm here")
 
 """ ROS lines
