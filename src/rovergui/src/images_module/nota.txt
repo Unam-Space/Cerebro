@@ -1,0 +1,36 @@
+Para el funcionamiento de el modulo de imagenes
+tanto como para camaras o imagenes independientes se necesita de las librerias 
+de opencv en python.
+
+--> pip install opencv-python
+
+
+Tambien se requieren de componentes extra en en el paquete de ROS adicionales a rospy
+y std_msgs, los cuales son:
+
+
+-cv_bridge
+-sensor_msgs
+
+
+estos se pueden agregar en el momeno de la creacion del paquete o en este caso 
+en el archivo  "CMakeLists.txt" en la parte:
+
+
+    find_package(catkin REQUIRED COMPONENTS
+    )
+
+
+se agregan despues de "REQUIRED COMPONENTS" y denro de los parentesis,
+ejemplo:
+
+
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  std_msgs
+  cv_bridge
+  sensor_msgs
+)
+
+
+despues se devera de ejecutar el catkin_make para compilar.
