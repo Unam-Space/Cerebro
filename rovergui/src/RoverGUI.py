@@ -14,6 +14,8 @@ import tkinter
 #import rospy
 import time 
 
+import math as m
+
 #ROS functions
 #DEPRECATED
 """"
@@ -199,6 +201,7 @@ def Battery(percentage):
 
 def SetImages():
     global UNAMSpaceLogo 
+    global temporaRover
     frameWdth, frameHght = FrameControl()
     imageSize = 200
 
@@ -208,6 +211,12 @@ def SetImages():
     UNAMSpaceLogo = ImageTk.PhotoImage(PIL.Image.open("Images/US-White.png").resize((logoSize,logoSize)))
     labelLogo = tkinter.Label(mainWindow, bg = "#181E36", image = UNAMSpaceLogo, width = logoSize , height = logoSize)
     labelLogo.place(x = imgOffset, y = imgOffset)
+
+
+    temporalsize = logoSize+200
+    temporaRover = ImageTk.PhotoImage(PIL.Image.open("Images/rover.jpg").resize((temporalsize+550,temporalsize+30)))
+    labeltemporal = tkinter.Label(mainWindow, image = temporaRover, width = temporalsize+550 , height = temporalsize+30)
+    labeltemporal.place(x = imgOffset+300, y = imgOffset+30)
 
 """
 Cuando  se presiona el boton de activacion de listener
@@ -278,7 +287,7 @@ tabla_datos_superior = SetUp()
 
 print("Fin del proceso!")
 for i in range(100):
-    update_table(tabla_datos_superior,[3.002+i,3.002+i,3.002+i,3.002+i]) #Longitud
+    update_table(tabla_datos_superior,[3.002+m.sqrt(m.pi*i),m.sqrt(7.002+i),5.002+i,(6.002+i)**i]) #Longitud
     mainWindow.update()
     time.sleep(2)
 
