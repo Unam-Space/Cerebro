@@ -7,13 +7,15 @@ from cProfile import label
 from pprint import pp
 from PIL import ImageTk, Image, ImageShow
 from click import command
-from std_msgs.msg import String
+#from std_msgs.msg import String
 import PIL.Image
 from tkinter import *
 import tkinter 
-import rospy
+#import rospy
 
 #ROS functions
+#DEPRECATED
+""""
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size = 10)
     rospy.init_node('talker', anonymous = True)
@@ -26,7 +28,8 @@ def talker():
         rospy.loginfo(hello_str)
         pub.publish(hello_str)
         rate.sleep()
-
+"""
+"""
 def callback(data):
     frameWdth, frameHght =  FrameControl()
 
@@ -37,7 +40,8 @@ def callback(data):
     listenerLabel = Label(mainWindow, text = dataStr)
     listenerLabel.config(font = ('Helvetica bold', 15))
     listenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
-
+"""
+"""
 def listener(): #(!)
     listenerButton = SetButtons()
     listenerButton.config(state = DISABLED)
@@ -45,14 +49,12 @@ def listener(): #(!)
     rospy.init_node('listener', anonymous = True)
     rospy.Subscriber("chatter", String, callback)
 """
-ROS lines
-roscore
-rosrun "talker_node"
+#ROS lines
+#roscore
+#rosrun "talker_node"
 
-"""
+
 #End of ROS functions
-
-
 def FrameControl():
     frameWdth = 230, 800, 200, 0    #x Size of frames
     frameHght = 475, 200, 0, 0      #y Size of frames
@@ -82,6 +84,29 @@ def SetFrames():
     nFrame[1].place(x = frameWdth[0] + 10, y = 10) ; nFrame[2].place(x = frameWdth[0] + frameWdth[1] + 20, y = 10)
     nFrame[3].place(x = frameWdth[0] + 10, y = frameHght[0] + 20) ; nFrame[4].place(x = frameWdth[0] + frameWdth[1] + 20, y = frameHght[0] + 20)    
 
+
+def creatre_table(total_rows,total_columns, values,root):
+    """
+    values[0] latitud
+    values[1] longitud
+    values[2] altitud
+    values[4] angulo
+    """
+    frameWdth, frameHght = FrameControl()
+    #screen_widht=root.winfo_screenwidth()
+    frameWdth, frameHght = FrameControl() 
+    dataStr="Latitud |"+str(values[0])+"| Longitud |" +str(values[1])+ "| Altitud |"+str(values[2])+"| Angulo |" +str(values[3])
+    listenerLabel = Label(mainWindow, text = dataStr)
+    listenerLabel.config(font = ('Arial', 16), fg='white', background='#181E36')
+    listenerLabel.place(x = 5 , y = 5)
+
+    """
+    for i in range(total_rows):
+        for j in range(total_columns):
+            tabla_datos_superior = Entry(root, width=int ((screen_widht/15)/total_columns), fg='white', background='#181E36',font=('Arial',13 ,'bold'),)
+            tabla_datos_superior.grid(row=i, column=j, )
+            tabla_datos_superior.insert(END, list[i][j])
+    """
 def KeyboardControl(event):
     global batteryLevel
     key = event.keysym
@@ -143,7 +168,7 @@ def Battery(percentage):
         else:
             cell[i] = Frame(mainWindow, width = bSize[0], height = bSize[1], bg = 'lime', bd = 2, relief = GROOVE)
             cell[i].place(x = xloc, y = yloc + i * bSize[1])
-
+    """"
     def batteryLoop(lvl):
         for i in range(lvl):
                 cell[i].config(bg = '#252A40')
@@ -167,6 +192,7 @@ def Battery(percentage):
     else:
         print("Battery is empty!")
         batteryLoop(6)
+    """
 
 def SetImages():
     global UNAMSpaceLogo 
@@ -180,13 +206,40 @@ def SetImages():
     labelLogo = tkinter.Label(mainWindow, bg = "#181E36", image = UNAMSpaceLogo, width = logoSize , height = logoSize)
     labelLogo.place(x = imgOffset, y = imgOffset)
 
+"""
+Cuando  se presiona el boton de activacion de listener
+"""
+def publish_reception_():
+    i=0
+    while True:
+        values_serial=[i*2, i-2*i, i, i+1]
+        print(values_serial)
+        creatre_table(len(values_serial), 1, values_serial, mainWindow)
+    #while True:
+    #   i+=1
+    #  values_serial=[i*2, i-2*i, i, i+1]
+    # creatre_table(len(values_serial), 1,values_serial,  mainWindow)
+ 
+    #frameWdth, frameHght = FrameControl() 
+    #dataStr=str(data)
+    #listenerLabel = Label(mainWindow, text = dataStr)
+    #listenerLabel.config(font = ('Helvetica bold', 15))
+    l#istenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
+
 def SetButtons():
     frameWdth, framHght = FrameControl()
     print("Esto va a pasar por aqui siempre")
-    listenerButton = tkinter.Button(text = "Activar Listener", command = listener)
+    listenerButton = tkinter.Button(text = "Activar Listener de ROVER", command = publish_reception_)#Boton para activar el listener
     listenerButton.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameWdth[1] / 4)
 
     return listenerButton
+
+def update_table(table, row, column, value):
+    #table.entries[row][column]
+    v_borra=table.get()
+    table.delete(0,last=len(v_borra))
+    table.insert(END, str(value))
+    
 
 def SetUp():
     mainWindow.title("Interfaz Grafica Rover V 1.5")
@@ -198,10 +251,11 @@ def SetUp():
     SetFrames()
     SetButtons()
     SetImages()
-    Battery(batteryLevel)
-
+    #Battery(batteryLevel)
+    empty_list=["Esperando"]*4
+    #creatre_table(len(empty_list), 1,empty_list,  mainWindow)
     mainWindow.bind("<Key>", KeyboardControl)
-    mainWindow.mainloop()
+    #return tabla
 
 batteryLevel = 100
 scaleNumber = 1.3
@@ -209,6 +263,27 @@ scaleNumber = 1.3
 print("Proceso iniciado")
 mainWindow = tkinter.Tk()
 SetUp()
-print("Fin del proceso!")
+##tabla_datos_superior.grid(row=i, column=j, )
+#tabla_datos_superior.insert(END, list[i][j])
+i=0
 
+   #
+    #update_table(mytable,0, 3, i) #Longitud
+    #update_table(mytable, 0,5, i)#Altitud
+    #update_table(mytable, 0,7, i)#Altitud
+    #i+=1
+print("Fin del proceso!")
+mainWindow.update()
+mainWindow.mainloop()
+
+
+"""
+RECIBO = GPS(Rover Position)[Latitud, Longitud, Altitud]
+RECIBO = BRUJULA (angulo respecto al norte)
+
+ENVIO = Movimiento (adelante, atras,  izquierda, derecha, detener) (control de velocidad izq, derecha)
+
+
+
+"""
 #*Nota para el manco* width == ancho, height == altura
