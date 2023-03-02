@@ -12,6 +12,7 @@ import PIL.Image
 from tkinter import *
 import tkinter 
 #import rospy
+import time 
 
 #ROS functions
 #DEPRECATED
@@ -90,23 +91,25 @@ def creatre_table(total_rows,total_columns, values,root):
     values[0] latitud
     values[1] longitud
     values[2] altitud
-    values[4] angulo
+    values[3] angulo
     """
     frameWdth, frameHght = FrameControl()
-    #screen_widht=root.winfo_screenwidth()
+    screen_widht=root.winfo_screenwidth()
     frameWdth, frameHght = FrameControl() 
     dataStr="Latitud |"+str(values[0])+"| Longitud |" +str(values[1])+ "| Altitud |"+str(values[2])+"| Angulo |" +str(values[3])
     listenerLabel = Label(mainWindow, text = dataStr)
     listenerLabel.config(font = ('Arial', 16), fg='white', background='#181E36')
     listenerLabel.place(x = 5 , y = 5)
 
-    """
+    
     for i in range(total_rows):
         for j in range(total_columns):
-            tabla_datos_superior = Entry(root, width=int ((screen_widht/15)/total_columns), fg='white', background='#181E36',font=('Arial',13 ,'bold'),)
+            tabla_datos_superior = Entry(root, width=int ((screen_widht/25)/total_columns), fg='white', background='#181E36',font=('Arial',13 ,'bold'),)
             tabla_datos_superior.grid(row=i, column=j, )
-            tabla_datos_superior.insert(END, list[i][j])
-    """
+            tabla_datos_superior.insert(END, values[i])
+
+    return tabla_datos_superior
+    
 def KeyboardControl(event):
     global batteryLevel
     key = event.keysym
@@ -215,16 +218,16 @@ def publish_reception_():
         values_serial=[i*2, i-2*i, i, i+1]
         print(values_serial)
         creatre_table(len(values_serial), 1, values_serial, mainWindow)
-    #while True:
-    #   i+=1
-    #  values_serial=[i*2, i-2*i, i, i+1]
-    # creatre_table(len(values_serial), 1,values_serial,  mainWindow)
+    while True:
+        i+=1
+        values_serial=[i*2, i-2*i, i, i+1]
+        creatre_table(len(values_serial), 1,values_serial,  mainWindow)
  
-    #frameWdth, frameHght = FrameControl() 
-    #dataStr=str(data)
-    #listenerLabel = Label(mainWindow, text = dataStr)
-    #listenerLabel.config(font = ('Helvetica bold', 15))
-    l#istenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
+    frameWdth, frameHght = FrameControl() 
+    dataStr=str(data)
+    listenerLabel = Label(mainWindow, text = dataStr)
+    listenerLabel.config(font = ('Helvetica bold', 15))
+    listenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
 
 def SetButtons():
     frameWdth, framHght = FrameControl()
@@ -234,11 +237,18 @@ def SetButtons():
 
     return listenerButton
 
-def update_table(table, row, column, value):
-    #table.entries[row][column]
-    v_borra=table.get()
-    table.delete(0,last=len(v_borra))
-    table.insert(END, str(value))
+def update_table(table, values):
+
+    data = ["Latitud: ", "Longitud: ", "Altitud: " ,"Angulo: "]
+    
+    frameWdth, frameHght = FrameControl()
+    screen_widht= mainWindow.winfo_screenwidth()
+    frameWdth, frameHght = FrameControl() 
+    
+    for i in range(4):
+        table = Entry( mainWindow, width=int ((screen_widht/25)/4), fg='white', background='#181E36',font=('Arial',13 ,'bold'),)
+        table.grid(row=0, column=i)
+        table.insert(END, data[i]+str(values[i]))
     
 
 def SetUp():
@@ -251,30 +261,30 @@ def SetUp():
     SetFrames()
     SetButtons()
     SetImages()
-    #Battery(batteryLevel)
+    Battery(batteryLevel)
     empty_list=["Esperando"]*4
-    #creatre_table(len(empty_list), 1,empty_list,  mainWindow)
+    tabla = creatre_table(1, 4,empty_list,  mainWindow)
     mainWindow.bind("<Key>", KeyboardControl)
-    #return tabla
+    return tabla
 
 batteryLevel = 100
 scaleNumber = 1.3
 
 print("Proceso iniciado")
 mainWindow = tkinter.Tk()
-SetUp()
-##tabla_datos_superior.grid(row=i, column=j, )
-#tabla_datos_superior.insert(END, list[i][j])
-i=0
+tabla_datos_superior = SetUp()
 
-   #
-    #update_table(mytable,0, 3, i) #Longitud
-    #update_table(mytable, 0,5, i)#Altitud
-    #update_table(mytable, 0,7, i)#Altitud
-    #i+=1
+
+
 print("Fin del proceso!")
-mainWindow.update()
+for i in range(100):
+    update_table(tabla_datos_superior,[3.002+i,3.002+i,3.002+i,3.002+i]) #Longitud
+    mainWindow.update()
+    time.sleep(2)
+
 mainWindow.mainloop()
+
+
 
 
 """

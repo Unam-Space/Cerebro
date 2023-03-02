@@ -43,7 +43,7 @@ class Utilities():
         logoSize = int(imageSize * scaleNumber)
         imgOffset = (frameWdth[0] - logoSize)/2 #Space used to center the logo in the first panel
 
-        UNAMSpaceLogo = ImageTk.PhotoImage(PIL.Image.open("Images/US-White.png").resize((logoSize,logoSize)))
+        UNAMSpaceLogo = ImageTk.PhotoImage(PIL.Image.open("US-White.png").resize((logoSize,logoSize)))
         labelLogo = tkinter.Label(mainWindow, bg = "#181E36", image = UNAMSpaceLogo, width = logoSize , height = logoSize)
         labelLogo.place(x = imgOffset, y = imgOffset)
 
