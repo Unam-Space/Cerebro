@@ -15,6 +15,12 @@ import tkinter
 import time 
 
 import math as m
+from geopy.geocoders import Nominatim
+import time
+#Dibujar mapas
+from mpl_toolkits.basemap.test import Basemap
+import matplotlib.pyplot as plt
+
 
 #ROS functions
 #DEPRECATED
@@ -98,10 +104,7 @@ def creatre_table(total_rows,total_columns, values,root):
     frameWdth, frameHght = FrameControl()
     screen_widht=root.winfo_screenwidth()
     frameWdth, frameHght = FrameControl() 
-    dataStr="Latitud |"+str(values[0])+"| Longitud |" +str(values[1])+ "| Altitud |"+str(values[2])+"| Angulo |" +str(values[3])
-    listenerLabel = Label(mainWindow, text = dataStr)
-    listenerLabel.config(font = ('Arial', 16), fg='white', background='#181E36')
-    listenerLabel.place(x = 5 , y = 5)
+
 
     
     for i in range(total_rows):
@@ -227,27 +230,58 @@ def publish_reception_():
         values_serial=[i*2, i-2*i, i, i+1]
         print(values_serial)
         creatre_table(len(values_serial), 1, values_serial, mainWindow)
-    while True:
-        i+=1
-        values_serial=[i*2, i-2*i, i, i+1]
-        creatre_table(len(values_serial), 1,values_serial,  mainWindow)
+    #while True:
+        #i+=1
+        #values_serial=[i*2, i-2*i, i, i+1]
+        #creatre_table(len(values_serial), 1,values_serial,  mainWindow)
  
+    
+
+def disconnect():
+    frameWdth, frameHght = FrameControl()
+    create_rectangle() 
+    #dataStr="ROVER IS DISCONNECTED"
+    #listenerLabel = Label(mainWindow, text = dataStr)
+    #listenerLabel.config(font = ('Helvetica bold', 15))
+    #listenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
+
+def connect():
     frameWdth, frameHght = FrameControl() 
-    dataStr=str(data)
+    create_rectangle()
+    dataStr="ROVER IS CONNECTED"
     listenerLabel = Label(mainWindow, text = dataStr)
     listenerLabel.config(font = ('Helvetica bold', 15))
     listenerLabel.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameHght[0] / 4)
 
+    #disconnectButton = tkinter.Button(text = "Connect to ROVER", command = disconnect(listenerLabel))#Boton para activar el listener
+   # = tkinter.Button(text = "Disconnect from Rover", command = SetButtons)#Boton para activar el listener
+
+bandera_conexion=False
+def create_rectangle():
+    frameWdth, frameHght = FrameControl() 
+    x=frameWdth[0] + frameWdth[1] / 4
+    canvas = Canvas()
+    if not bandera_conexion:
+        canvas.create_rectangle(x,x,x+20,x+20,outline ="black",fill ="red",width = 2)
+        bandera_conexion=True
+    else:
+        canvas.create_rectangle(10,10,110,110,outline ="black",fill ="green",width = 2)
+        bandera_conexion=False
+
 def SetButtons():
     frameWdth, framHght = FrameControl()
-    print("Esto va a pasar por aqui siempre")
-    listenerButton = tkinter.Button(text = "Activar Listener de ROVER", command = publish_reception_)#Boton para activar el listener
+    #print("Esto va a pasar por aqui siempre")
+    listenerButton = tkinter.Button(text = "Connect to ROVER", command = connect)#Boton para activar el listener
     listenerButton.place(x = frameWdth[0] + frameWdth[1] / 4, y = frameWdth[0] + frameWdth[1] / 4)
-
-    return listenerButton
+    disconnect_button=tkinter.Button(text ="Disconnect to Rover", command=disconnect)
+    disconnect_button.place(x = (frameWdth[0] + frameWdth[1] / 4) +150, y = (frameWdth[0] + frameWdth[1] / 4))
+    return listenerButton, disconnect_button
 
 def update_table(table, values):
-
+    dataStr="Connected"
+    #listenerLabel = Label(mainWindow, text = dataStr)
+    #listenerLabel.config(font = ('Arial', 16), fg='white', background='#181E36')
+    #listenerLabel.place(x = 5 , y = 5)
     data = ["Latitud: ", "Longitud: ", "Altitud: " ,"Angulo: "]
     
     frameWdth, frameHght = FrameControl()
@@ -259,6 +293,40 @@ def update_table(table, values):
         table.grid(row=0, column=i)
         table.insert(END, data[i]+str(values[i]))
     
+def getting_communication(tabla,i):
+    """
+    Actualizamos la tabla de valores recibidos por el Rover
+    Los params data solo serán auxiliares para algún otro caso.
+    El serial de arduino deberá ser leído desde está función
+    """
+    x = m.radians(0.1) 
+    altitud_cu=2280
+    grado=-90.0000
+    update_table(tabla,[19.341690+(0.5*i),-99.180362*m.cos (x),altitud_cu*m.sin(x), grado+m.cos(x)]) 
+    print("Comunicando con el rover")
+    #Mapa
+    geolocator = Nominatim(user_agent="AppMap")
+
+    location = geolocator.geocode("Copilco Ciudad de Mexico")
+    print(location.address)
+
+    #Dimensiónd de la figura
+    plt.figure(figsize=(16,12))
+
+    #Distribución lines costeras
+    eq_map=Basemap(projection='robin',lon_0=019.341690,lat_0= -89.2123)
+
+    #Dibujar lineas costeras y paises
+    eq_map.drawcoastlines()
+    eq_map.drawcountries()
+
+    #Definir colores
+    eq_map.fillcontinents(color="brown")
+    eq_map.drawmapboundary(fill_color="aqua")
+
+    #Situo el lugar en el mapa
+    x,y = eq_map(location.longitude,location.latitude)
+    eq_map.plot(x,y, "ro", markersize=17, alpha=0.8)
 
 def SetUp():
     mainWindow.title("Interfaz Grafica Rover V 1.5")
@@ -283,26 +351,36 @@ print("Proceso iniciado")
 mainWindow = tkinter.Tk()
 tabla_datos_superior = SetUp()
 
-
-
-print("Fin del proceso!")
-for i in range(100):
-    update_table(tabla_datos_superior,[3.002+m.sqrt(m.pi*i),m.sqrt(7.002+i),5.002+i,(6.002+i)**i]) #Longitud
-    mainWindow.update()
-    time.sleep(2)
-
-mainWindow.mainloop()
+i=0
+#while True:
 
 
 
+"""
+#Latitud,Longitud
+#19.341690, -99.180362
 
+[]
+getting_communication(tabla_datos_superior,variador)
+
+"""
 """
 RECIBO = GPS(Rover Position)[Latitud, Longitud, Altitud]
 RECIBO = BRUJULA (angulo respecto al norte)
 
 ENVIO = Movimiento (adelante, atras,  izquierda, derecha, detener) (control de velocidad izq, derecha)
-
+""""""
 
 
 """
+n=-1
+while i>n:
+    print("Comunicando con el rover")
+    i+=1
+    #update_table(tabla_datos_superior,[3.002+m.sqrt(m.pi*i),m.sqrt(7.002+i),5.002+i,(6.002+i)**i]) #Longitud
+    getting_communication(tabla_datos_superior,i)
+    time.sleep(2)
+    mainWindow.update()
+
+mainWindow.mainloop()
 #*Nota para el manco* width == ancho, height == altura
